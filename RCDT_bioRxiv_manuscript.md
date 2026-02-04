@@ -34,7 +34,7 @@ This formulation has several advantages:
 
 1. **Mechanistic specificity**: Pharmacology acts through receptor density distributions (e.g., 5-HT2A from PET), not global parameter shifts.
 2. **Geometric objectivity**: Topological invariants (Betti numbers, persistence barcodes) are coordinate-free and do not depend on phenomenological interpretation.
-3. **Falsifiability**: Failure modes are explicitly defined—e.g., topological changes independent of receptor map ρ would reject the hypothesis.
+3. **Falsifiability**: Failure modes are explicitly defined—e.g., topological changes independent of receptor map $\rho$ would reject the hypothesis.
 
 ---
 
@@ -44,78 +44,78 @@ This formulation has several advantages:
 
 **Anatomy**: We use the Schaefer atlas (Schaefer et al., 2018) parcellated into 30 cortical regions, providing a low-resolution whole-brain scaffold suitable for in-silico simulation.
 
-**Connectivity**: Structural connectivity (SC) is obtained from the Human Connectome Project (Van Essen et al., 2013). The group-averaged SC matrix \(\mathbf{C}\) is normalized to unit spectral radius to ensure numerical stability of the coupled dynamics:
+**Connectivity**: Structural connectivity (SC) is obtained from the Human Connectome Project (Van Essen et al., 2013). The group-averaged SC matrix $\mathbf{C}$ is normalized to unit spectral radius to ensure numerical stability of the coupled dynamics:
 
-\[
+$$
 \mathbf{C}_{\text{norm}} = \frac{\mathbf{C}}{\rho(\mathbf{C})}
-\]
+$$
 
-**Axonal Delays**: Inter-regional conduction delays are computed from Euclidean distances \(D_{ij}\) and a fixed axonal conduction velocity \(v\):
+**Axonal Delays**: Inter-regional conduction delays are computed from Euclidean distances $D_{ij}$ and a fixed axonal conduction velocity $v$:
 
-\[
+$$
 \tau_{ij} = \frac{D_{ij}}{v}
-\]
+$$
 
-where \(v = 5\) m/s (Caminiti et al., 2009). Delays prevent unphysical instantaneous synchronization and introduce biologically realistic temporal structure.
+where $v = 5$ m/s (Caminiti et al., 2009). Delays prevent unphysical instantaneous synchronization and introduce biologically realistic temporal structure.
 
 ### 2. Neural Mass Model: Wilson–Cowan Dynamics
 
-Each brain region \(i\) is modeled as a Wilson–Cowan excitatory–inhibitory (E–I) population (Wilson & Cowan, 1972). The coupled differential equations are:
+Each brain region $i$ is modeled as a Wilson–Cowan excitatory–inhibitory (E–I) population (Wilson & Cowan, 1972). The coupled differential equations are:
 
-\[
+$$
 \tau_E \dot{E}_i = -E_i + S\left( G_i \cdot \left( w_{EE} E_i - w_{IE} I_i + \sum_{j} C_{ij} E_j(t - \tau_{ij}) + P_i \right) \right)
-\]
+$$
 
-\[
+$$
 \tau_I \dot{I}_i = -I_i + S\left( w_{EI} E_i - w_{II} I_i \right)
-\]
+$$
 
 where:
-- \(E_i\), \(I_i\): excitatory and inhibitory population activities
-- \(\tau_E\), \(\tau_I\): population time constants
-- \(C_{ij}\): structural connectivity (normalized)
-- \(P_i\): background/baseline input
-- \(S(x) = (1 + e^{-x})^{-1}\): sigmoidal transfer function
-- \(G_i\): **heterogeneous gain** (see below)
+- $E_i$, $I_i$: excitatory and inhibitory population activities
+- $\tau_E$, $\tau_I$: population time constants
+- $C_{ij}$: structural connectivity (normalized)
+- $P_i$: background/baseline input
+- $S(x) = (1 + e^{-x})^{-1}$: sigmoidal transfer function
+- $G_i$: **heterogeneous gain** (see below)
 
-The gain \(G_i\) modulates the effective input to the excitatory population, providing the pharmacological coupling.
+The gain $G_i$ modulates the effective input to the excitatory population, providing the pharmacological coupling.
 
 #### 2.1 Stochastic Integration: Euler–Maruyama Scheme
 
 Numerical integration was performed using the **Euler–Maruyama** scheme to accommodate both the deterministic dynamics and a small additive Brownian noise term. This stochastic extension prevents the system from remaining trapped in stable fixed points and facilitates exploration of the bifurcation regime. The update equations are:
 
-\[
+$$
 E_i(t + \Delta t) = E_i(t) + \Delta t \cdot \frac{dE_i}{dt} + \sigma \sqrt{\Delta t} \cdot \xi^E_i, \quad \xi^E_i \sim \mathcal{N}(0, 1)
-\]
+$$
 
-\[
+$$
 I_i(t + \Delta t) = I_i(t) + \Delta t \cdot \frac{dI_i}{dt} + \sigma \sqrt{\Delta t} \cdot \xi^I_i, \quad \xi^I_i \sim \mathcal{N}(0, 1)
-\]
+$$
 
-where \(\sigma\) is the noise amplitude (default \(\sigma = 0.02\)) and \(\xi\) are independent standard normal variates. The \(\sqrt{\Delta t}\) scaling ensures correct statistical properties of the discretized Wiener process. Activity variables are clipped to \([0, 1]\) after each step. Axonal delays are implemented via a circular buffer storing recent excitatory activity history.
+where $\sigma$ is the noise amplitude (default $\sigma = 0.02$) and $\xi$ are independent standard normal variates. The $\sqrt{\Delta t}$ scaling ensures correct statistical properties of the discretized Wiener process. Activity variables are clipped to $[0, 1]$ after each step. Axonal delays are implemented via a circular buffer storing recent excitatory activity history.
 
 #### 2.2 Bifurcation Sweep for Parameter Selection
 
-To identify the coupling sensitivity range where H₁ topological features (loops) first emerge, a **parameter sweep** was performed over \(k \in [0.5, 5.0]\) at fixed \([D] = 1.0\). For each \(k\), the model was integrated, the global mean excitatory signal extracted, and Persistent Entropy computed on the H₁ diagram. The **bifurcation threshold** \(k_{\text{crit}}\) was defined as the smallest \(k\) at which \(\text{PE}(\text{H}_1) \geq 0.01\). This procedure guides selection of \(k\) and \([D]\) for the main simulations to ensure the system operates in a regime where pharmacological perturbations induce detectable topological transitions (see *fig2_supp_bifurcation_sweep.png*).
+To identify the coupling sensitivity range where $H_1$ topological features (loops) first emerge, a **parameter sweep** was performed over $k \in [0.5, 5.0]$ at fixed $[D] = 1.0$. For each $k$, the model was integrated, the global mean excitatory signal extracted, and Persistent Entropy computed on the $H_1$ diagram. The **bifurcation threshold** $k_{\text{crit}}$ was defined as the smallest $k$ at which $\text{PE}(\text{H}_1) \geq 0.01$. This procedure guides selection of $k$ and $[D]$ for the main simulations to ensure the system operates in a regime where pharmacological perturbations induce detectable topological transitions (see *fig2_supp_bifurcation_sweep.png*).
 
 ### 3. Pharmacology: Heterogeneous Gain Modulation
 
 Pharmacological perturbation is implemented as **node-specific gain modulation** weighted by regional receptor density:
 
-\[
+$$
 G_i = G_0 + k \cdot \rho_i \cdot [D]
-\]
+$$
 
 where:
-- \(G_0 = 1.0\): baseline gain
-- \(\rho_i\): normalized 5-HT2A receptor density in region \(i\) (Beliveau et al., 2017; NeuroVault collection)
-- \([D]\): drug concentration operator (control parameter)
-- \(k \in [0.5, 5.0]\): coupling strength scaling receptor–gain sensitivity (range determined by bifurcation sweep)
+- $G_0 = 1.0$: baseline gain
+- $\rho_i$: normalized 5-HT2A receptor density in region $i$ (Beliveau et al., 2017; NeuroVault collection)
+- $[D]$: drug concentration operator (control parameter)
+- $k \in [0.5, 5.0]$: coupling strength scaling receptor–gain sensitivity (range determined by bifurcation sweep)
 
 This formulation ensures:
 - **Identical drug exposure** across all nodes (systemic administration)
-- **Differential functional impact** determined solely by \(\rho_i\)
-- **Bifurcation potential**: Sufficient \(k \cdot \rho_i \cdot [D]\) can shift local dynamics from stable fixed points to limit cycles or chaos, propagating via structural coupling.
+- **Differential functional impact** determined solely by $\rho_i$
+- **Bifurcation potential**: Sufficient $k \cdot \rho_i \cdot [D]$ can shift local dynamics from stable fixed points to limit cycles or chaos, propagating via structural coupling.
 
 No assumptions are made regarding phenomenological effects (e.g., "psychedelic experience"); the model tests structural consequences only.
 
@@ -123,49 +123,49 @@ No assumptions are made regarding phenomenological effects (e.g., "psychedelic e
 
 #### 4.1 State-Space Reconstruction (Takens' Theorem)
 
-Given a scalar time series \(x(t)\), we reconstruct the underlying attractor using time-delay embedding (Takens, 1981):
+Given a scalar time series $x(t)$, we reconstruct the underlying attractor using time-delay embedding (Takens, 1981):
 
-\[
+$$
 \mathbf{X}(t) = \left[ x(t), \, x(t+\tau), \, x(t+2\tau), \, \ldots, \, x(t+(m-1)\tau) \right]
-\]
+$$
 
 Parameters:
-- Embedding dimension: \(m = 3\)
-- Delay \(\tau\): chosen via mutual information or first minimum of autocorrelation
+- Embedding dimension: $m = 3$
+- Delay $\tau$: chosen via mutual information or first minimum of autocorrelation
 - No system-specific tuning beyond minimal feasibility
 
 #### 4.2 Vietoris–Rips Complex
 
-For a point cloud \(X \subset \mathbb{R}^m\) and scale parameter \(\epsilon \geq 0\), the **Vietoris–Rips complex** \(\mathcal{R}(X, \epsilon)\) is the abstract simplicial complex where a simplex \(\sigma = [v_0, v_1, \ldots, v_k]\) is included iff all pairwise distances \(d(v_i, v_j) \leq \epsilon\) for \(v_i, v_j \in \sigma\).
+For a point cloud $X \subset \mathbb{R}^m$ and scale parameter $\epsilon \geq 0$, the **Vietoris–Rips complex** $\mathcal{R}(X, \epsilon)$ is the abstract simplicial complex where a simplex $\sigma = [v_0, v_1, \ldots, v_k]$ is included iff all pairwise distances $d(v_i, v_j) \leq \epsilon$ for $v_i, v_j \in \sigma$.
 
-As \(\epsilon\) increases, we obtain a filtration:
+As $\epsilon$ increases, we obtain a filtration:
 
-\[
+$$
 \mathcal{R}(X, \epsilon_0) \subseteq \mathcal{R}(X, \epsilon_1) \subseteq \cdots \subseteq \mathcal{R}(X, \epsilon_{\max})
-\]
+$$
 
 #### 4.3 Persistent Homology and Persistence Barcode
 
-Persistent homology tracks the birth and death of topological features (connected components, loops, voids) across the filtration. A \(p\)-dimensional homology class born at \(\epsilon_b\) and dying at \(\epsilon_d\) is represented as an interval \((\epsilon_b, \epsilon_d)\) in the **persistence barcode**.
+Persistent homology tracks the birth and death of topological features (connected components, loops, voids) across the filtration. A $p$-dimensional homology class born at $\epsilon_b$ and dying at $\epsilon_d$ is represented as an interval $(\epsilon_b, \epsilon_d)$ in the **persistence barcode**.
 
 We compute:
-- **H₀**: connected components (0-cycles)
-- **H₁**: loops (1-cycles; Betti-1)
+- **H$_0$**: connected components (0-cycles)
+- **H$_1$**: loops (1-cycles; Betti-1)
 
 **Discrimination criterion**:
-- **Limit cycle dynamics**: single dominant H₁ feature with long persistence
-- **Chaotic dynamics**: multiple H₁ features or broadened persistence distribution
+- **Limit cycle dynamics**: single dominant $H_1$ feature with long persistence
+- **Chaotic dynamics**: multiple $H_1$ features or broadened persistence distribution
 - **Noise**: persistence diagram collapses to the diagonal (short-lived features)
 
 #### 4.4 Persistent Entropy (Quantitative Summary)
 
-To quantify topological complexity as a scalar function of \([D]\), we compute **Persistent Entropy** (Atienza et al., 2016) on the H₁ persistence diagram:
+To quantify topological complexity as a scalar function of $[D]$, we compute **Persistent Entropy** (Atienza et al., 2016) on the $H_1$ persistence diagram:
 
-\[
+$$
 \text{PE} = -\sum_{i} p_i \log p_i, \quad p_i = \frac{\ell_i}{L}, \quad \ell_i = d_i - b_i, \quad L = \sum_i \ell_i
-\]
+$$
 
-where \((b_i, d_i)\) are birth–death pairs and \(\ell_i\) are lifetimes. Higher PE indicates a more dispersed distribution of feature lifetimes (fragmented topology); lower PE indicates concentration in few dominant features (constrained attractor). A **non-linear jump** in PE as \([D]\) increases provides quantitative support for the phase transition hypothesis (see Figure 3).
+where $(b_i, d_i)$ are birth–death pairs and $\ell_i$ are lifetimes. Higher PE indicates a more dispersed distribution of feature lifetimes (fragmented topology); lower PE indicates concentration in few dominant features (constrained attractor). A **non-linear jump** in PE as $[D]$ increases provides quantitative support for the phase transition hypothesis (see Figure 3).
 
 ---
 
@@ -178,11 +178,11 @@ where \((b_i, d_i)\) are birth–death pairs and \(\ell_i\) are lifetimes. Highe
 **Method**:
 - **Ordered system**: Van der Pol oscillator (limit cycle)
 - **Chaotic system**: Lorenz system (strange attractor)
-- Single scalar observable \(x(t)\) from each; identical embedding and TDA parameters
+- Single scalar observable $x(t)$ from each; identical embedding and TDA parameters
 
 **Success criterion**:
 - Van der Pol: single dominant Betti-1 feature
-- Lorenz: increased topological complexity (multiple or broadened H₁ features)
+- Lorenz: increased topological complexity (multiple or broadened $H_1$ features)
 - Noise: no long-lived features
 
 *Without this calibration, downstream inference is invalid.*
@@ -191,22 +191,22 @@ where \((b_i, d_i)\) are birth–death pairs and \(\ell_i\) are lifetimes. Highe
 
 **Objective**: Isolate 5-HT2A-specific effects from generic gain heterogeneity.
 
-**Method**: For each drug concentration \([D]\), run two conditions:
-1. **Experimental**: \(G_i = G_0 + k \cdot \rho_i \cdot [D]\) (true receptor map)
-2. **Control**: \(G_i = G_0 + k \cdot \rho_{\pi(i)} \cdot [D]\) where \(\pi\) is a random permutation of region indices (shuffled receptor map)
+**Method**: For each drug concentration $[D]$, run two conditions:
+1. **Experimental**: $G_i = G_0 + k \cdot \rho_i \cdot [D]$ (true receptor map)
+2. **Control**: $G_i = G_0 + k \cdot \rho_{\pi(i)} \cdot [D]$ where $\pi$ is a random permutation of region indices (shuffled receptor map)
 
 **Interpretation**: If topological changes are similar under shuffling, the effect is not 5-HT2A-specific; the RCDT hypothesis is weakened or rejected.
 
 ### Aim 3: Critical Concentration Prediction
 
-**Objective**: Predict a non-linear jump in topological complexity at a critical concentration \([D]_{\text{crit}}\).
+**Objective**: Predict a non-linear jump in topological complexity at a critical concentration $[D]_{\text{crit}}$.
 
-**Method**: Compute **Persistent Entropy** (Section 4.4) as a function of \([D]\) and plot the concentration–topology response curve (Figure 3). The RCDT hypothesis predicts:
-- Below \([D]_{\text{crit}}\): low-dimensional attractor (stable Betti-1)
-- At/near \([D]_{\text{crit}}\): bifurcation; non-linear increase in persistent entropy
-- Above \([D]_{\text{crit}}\): fragmented or high-dimensional topology
+**Method**: Compute **Persistent Entropy** (Section 4.4) as a function of $[D]$ and plot the concentration–topology response curve (Figure 3). The RCDT hypothesis predicts:
+- Below $[D]_{\text{crit}}$: low-dimensional attractor (stable Betti-1)
+- At/near $[D]_{\text{crit}}$: bifurcation; non-linear increase in persistent entropy
+- Above $[D]_{\text{crit}}$: fragmented or high-dimensional topology
 
-**Deliverable**: Figure 3—a line plot of Persistent Entropy vs \([D]\). A non-linear jump at \([D]_{\text{crit}}\) provides quantitative evidence for the phase transition; absence of such structure would falsify the bifurcation mechanism.
+**Deliverable**: Figure 3—a line plot of Persistent Entropy vs $[D]$. A non-linear jump at $[D]_{\text{crit}}$ provides quantitative evidence for the phase transition; absence of such structure would falsify the bifurcation mechanism.
 
 ---
 
@@ -214,21 +214,25 @@ where \((b_i, d_i)\) are birth–death pairs and \(\ell_i\) are lifetimes. Highe
 
 ### Figure 1: TDA Pipeline Calibration
 
-**File**: `fig1_tda_validation.png`
+![TDA pipeline calibration on Van der Pol (limit cycle) and Lorenz (chaos) systems.](figs/fig1_tda_validation.png)
 
-The Takens embedding + persistent homology pipeline was validated on canonical dynamical systems. Van der Pol (limit cycle) yields a single dominant H₁ feature with long persistence; Lorenz (chaos) yields increased topological complexity (multiple or broadened H₁ features). This calibration establishes that the TDA pipeline discriminates ordered from chaotic dynamics using only scalar observations, without access to governing equations.
+*Figure 1.* TDA pipeline calibration. Van der Pol yields a single dominant $H_1$ feature; Lorenz yields increased topological complexity.
+
+The Takens embedding + persistent homology pipeline was validated on canonical dynamical systems. Van der Pol (limit cycle) yields a single dominant $H_1$ feature with long persistence; Lorenz (chaos) yields increased topological complexity (multiple or broadened $H_1$ features). This calibration establishes that the TDA pipeline discriminates ordered from chaotic dynamics using only scalar observations, without access to governing equations.
 
 ### Figure 2: Receptor-Weighted Topological Reorganization
 
-**Files**: `fig2_receptor_topology.png`, `fig2_supp_shuffled_control.png`, `fig2_supp_bifurcation_sweep.png`
+![Receptor-weighted whole-brain topology: brain graph and persistence diagrams across drug concentrations.](figs/fig2_receptor_topology.png)
 
-The whole-brain Wilson–Cowan model with heterogeneous gain modulation (Eq. 3) was simulated across drug concentrations \([D] \in \{0, 0.5, 1.0, 1.5, 2.0\}\). Panel A shows the structural connectivity graph with nodes coloured by 5-HT2A receptor density \(\rho_i\). Panels B–F display persistence diagrams for each concentration. The receptor shuffling control (`fig2_supp_shuffled_control.png`) compares experimental vs. permuted \(\rho\); divergence supports 5-HT2A-specificity. The bifurcation sweep (`fig2_supp_bifurcation_sweep.png`) identifies \(k_{\text{crit}}\) where H₁ features first emerge.
+*Figure 2.* Main: structural connectivity graph (nodes coloured by 5-HT2A receptor density) and persistence diagrams for $[D] \in \{0, 0.5, 1.0, 1.5, 2.0\}$. See supplementary figures for receptor shuffling control and bifurcation sweep.
+
+The whole-brain Wilson–Cowan model with heterogeneous gain modulation (Eq. 3) was simulated across drug concentrations $[D] \in \{0, 0.5, 1.0, 1.5, 2.0\}$. Panel A shows the structural connectivity graph with nodes coloured by 5-HT2A receptor density $\rho_i$. Panels B–F display persistence diagrams for each concentration. The receptor shuffling control (`fig2_supp_shuffled_control.png`) compares experimental vs. permuted $\rho$; divergence supports 5-HT2A-specificity. The bifurcation sweep (`fig2_supp_bifurcation_sweep.png`) identifies $k_{\text{crit}}$ where $H_1$ features first emerge.
 
 ### Figure 3: Persistent Entropy Quantifies Phase Transition
 
-**File**: `fig3_persistent_entropy.png`
+![Persistent Entropy vs drug concentration, showing non-linear jump at critical value.](figs/fig3_persistent_entropy.png)
 
-**Caption**: Persistent Entropy (H₁) as a function of drug concentration \([D]\). The RCDT hypothesis predicts a **non-linear jump** in PE as \([D]\) crosses a critical value \([D]_{\text{crit}}\). Below \([D]_{\text{crit}}\), the attractor remains low-dimensional (few dominant 1-cycles), yielding low PE. Above \([D]_{\text{crit}}\), the topology fragments—multiple loops emerge with dispersed lifetimes—raising PE. This curve provides *quantitative* evidence for a phase transition: a sharp PE increase indicates bifurcation of the global dynamical regime, operationally consistent with *ego dissolution* as Betti-1 stability breakdown. When experimental (true \(\rho\)) and shuffled (\(\rho_\pi\)) conditions are compared, a larger PE increase in the experimental group supports receptor-specificity. Absence of a non-linear jump would falsify the bifurcation mechanism; flat or monotonic PE would indicate the system remains in a single dynamical regime across \([D]\).
+*Figure 3.* Persistent Entropy ($H_1$) as a function of drug concentration $[D]$. The RCDT hypothesis predicts a **non-linear jump** in PE as $[D]$ crosses a critical value $[D]_{\text{crit}}$. Below $[D]_{\text{crit}}$, the attractor remains low-dimensional (few dominant 1-cycles), yielding low PE. Above $[D]_{\text{crit}}$, the topology fragments—multiple loops emerge with dispersed lifetimes—raising PE. This curve provides *quantitative* evidence for a phase transition: a sharp PE increase indicates bifurcation of the global dynamical regime, operationally consistent with *ego dissolution* as Betti-1 stability breakdown. When experimental (true $\rho$) and shuffled ($\rho_\pi$) conditions are compared, a larger PE increase in the experimental group supports receptor-specificity. Absence of a non-linear jump would falsify the bifurcation mechanism; flat or monotonic PE would indicate the system remains in a single dynamical regime across $[D]$.
 
 ---
 
@@ -237,20 +241,20 @@ The whole-brain Wilson–Cowan model with heterogeneous gain modulation (Eq. 3) 
 | Parameter | Symbol | Value | Source |
 |-----------|--------|-------|--------|
 | Parcellation | — | Schaefer 30 nodes | Schaefer et al., 2018 |
-| Structural connectivity | \(\mathbf{C}\) | HCP group-averaged | Van Essen et al., 2013 |
-| Conduction velocity | \(v\) | 5 m/s | Caminiti et al., 2009 |
-| Baseline gain | \(G_0\) | 1.0 | — |
-| Receptor–gain coupling | \(k\) | [0.5, 5.0] | Bifurcation sweep |
-| Noise amplitude | \(\sigma\) | 0.02 | Euler–Maruyama |
-| 5-HT2A receptor map | \(\rho_i\) | Normalized PET | Beliveau et al., 2017; NeuroVault |
-| Embedding dimension | \(m\) | 3 | Takens |
-| Embedding delay | \(\tau\) | Data-dependent | Mutual information |
-| E population time constant | \(\tau_E\) | 10 ms | Wilson–Cowan |
-| I population time constant | \(\tau_I\) | 5 ms | Wilson–Cowan |
-| E→E weight | \(w_{EE}\) | 1.2 | — |
-| I→E weight | \(w_{IE}\) | 1.0 | — |
-| E→I weight | \(w_{EI}\) | 1.0 | — |
-| I→I weight | \(w_{II}\) | 0.7 | — |
+| Structural connectivity | $\mathbf{C}$ | HCP group-averaged | Van Essen et al., 2013 |
+| Conduction velocity | $v$ | 5 m/s | Caminiti et al., 2009 |
+| Baseline gain | $G_0$ | 1.0 | — |
+| Receptor–gain coupling | $k$ | [0.5, 5.0] | Bifurcation sweep |
+| Noise amplitude | $\sigma$ | 0.02 | Euler–Maruyama |
+| 5-HT2A receptor map | $\rho_i$ | Normalized PET | Beliveau et al., 2017; NeuroVault |
+| Embedding dimension | $m$ | 3 | Takens |
+| Embedding delay | $\tau$ | Data-dependent | Mutual information |
+| E population time constant | $\tau_E$ | 10 ms | Wilson–Cowan |
+| I population time constant | $\tau_I$ | 5 ms | Wilson–Cowan |
+| E→E weight | $w_{EE}$ | 1.2 | — |
+| I→E weight | $w_{IE}$ | 1.0 | — |
+| E→I weight | $w_{EI}$ | 1.0 | — |
+| I→I weight | $w_{II}$ | 0.7 | — |
 
 ---
 
@@ -266,11 +270,11 @@ This interpretation is mechanistic and geometric; it does not claim that topolog
 
 The RCDT hypothesis is rejected if any of the following obtain:
 
-1. **Receptor-map independence**: Topological changes under drug perturbation are statistically indistinguishable when \(\rho_i\) is replaced by a shuffled \(\rho_{\pi(i)}\). This would imply that receptor distribution is irrelevant—the effect would be generic gain modulation, not 5-HT2A-specific.
+1. **Receptor-map independence**: Topological changes under drug perturbation are statistically indistinguishable when $\rho_i$ is replaced by a shuffled $\rho_{\pi(i)}$. This would imply that receptor distribution is irrelevant—the effect would be generic gain modulation, not 5-HT2A-specific.
 
 2. **Noise-equivalent topology**: The persistent homology of simulated time series is indistinguishable from that of appropriately scaled noise (e.g., surrogate data). This would invalidate the claim that deterministic structure is being detected.
 
-3. **Monotonic or absent concentration–topology relationship**: Persistent entropy (or equivalent) shows no non-linear jump, or no systematic change, as \([D]\) increases. The hypothesis predicts a critical transition; its absence would falsify the bifurcation mechanism.
+3. **Monotonic or absent concentration–topology relationship**: Persistent entropy (or equivalent) shows no non-linear jump, or no systematic change, as $[D]$ increases. The hypothesis predicts a critical transition; its absence would falsify the bifurcation mechanism.
 
 ---
 
@@ -296,7 +300,7 @@ We have formalized the Receptor-Constrained Dynamical Topology (RCDT) hypothesis
 
 - **5-HT2A receptor map**: NeuroVault (https://neurovault.org/)
 - **Structural connectivity**: Human Connectome Project (https://www.humanconnectome.org/)
-- **Simulation code**: [Repository URL to be added upon publication]
+- **Simulation code**: https://github.com/lincNK/RCDT-Model
 
 ---
 
