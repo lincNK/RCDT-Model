@@ -1,6 +1,8 @@
 # Receptor-Constrained Dynamical Topology (RCDT) Hypothesis
 
-A computational framework bridging molecular pharmacology and whole-brain dynamics through topological data analysis. The RCDT hypothesis proposes that receptor-weighted gain modulation induces **topological phase transitions** in neural attractors—detectable as non-linear jumps in Persistent Entropy across drug concentration.
+[![bioRxiv](https://img.shields.io/badge/bioRxiv-2026.02.04.703742-B31B1B)](https://doi.org/10.64898/2026.02.04.703742)
+
+**Preprint now live on bioRxiv.** A computational framework bridging molecular pharmacology and whole-brain dynamics through topological data analysis. The RCDT hypothesis proposes that receptor-weighted gain modulation induces **topological phase transitions** in neural attractors—detectable as non-linear jumps in Persistent Entropy across drug concentration.
 
 ---
 
@@ -96,11 +98,12 @@ If you use this code or the RCDT hypothesis in your research, please cite our pr
 ```bibtex
 @article{Wang2026RCDT,
   title={Topological Phase Transitions in Whole-Brain Dynamics Driven by Spatially Heterogeneous Receptor Gain Modulation: A Receptor-Constrained Dynamical Topology (RCDT) Hypothesis},
-  author={Haolong Wang},
+  author={Wang, Haolong},
   journal={bioRxiv},
   year={2026},
-  note={Preprint},
-  doi={Pending}
+  publisher={Cold Spring Harbor Laboratory},
+  doi={10.64898/2026.02.04.703742},
+  url={https://doi.org/10.64898/2026.02.04.703742}
 }
 ```
 
