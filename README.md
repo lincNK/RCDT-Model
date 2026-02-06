@@ -98,7 +98,7 @@ If you use this code or the RCDT hypothesis in your research, please cite our pr
 ```bibtex
 @article{Wang2026RCDT,
   title={Topological Phase Transitions in Whole-Brain Dynamics Driven by Spatially Heterogeneous Receptor Gain Modulation: A Receptor-Constrained Dynamical Topology (RCDT) Hypothesis},
-  author={Wang, Haolong},
+  author={Haolong Wang},
   journal={bioRxiv},
   year={2026},
   publisher={Cold Spring Harbor Laboratory},
