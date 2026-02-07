@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>RCDT_bioRxiv_manuscript</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 25mm;
+      padding-right: 25mm;
+      padding-top: 25mm;
+      padding-bottom: 25mm;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<h1
+id="topological-phase-transitions-in-whole-brain-dynamics-driven-by-spatially-heterogeneous-receptor-gain-modulation-a-receptor-constrained-dynamical-topology-rcdt-hypothesis">Topological
+Phase Transitions in Whole-Brain Dynamics Driven by Spatially
+Heterogeneous Receptor Gain Modulation: A Receptor-Constrained Dynamical
+Topology (RCDT) Hypothesis</h1>
+<p><strong>Authors:</strong> Haolong Wang</p>
+<p><strong>Affiliation:</strong> Independent Researcher</p>
+<p><strong>Correspondence:</strong> darktree79v@gmail.com</p>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>The mechanistic link between molecular pharmacology and global brain
+dynamics remains unresolved—a “scale bridge” problem central to
+consciousness research. We propose the Receptor-Constrained Dynamical
+Topology (RCDT) hypothesis: that the functional impact of
+neuromodulatory drugs propagates from local ligand–receptor binding
+events through spatially heterogeneous gain modulation to produce
+qualitative reorganizations of the whole-brain dynamical attractor.
+Using a biophysically grounded whole-brain model—Wilson–Cowan
+excitatory–inhibitory dynamics on structural connectivity with axonal
+delays—we implement pharmacology via gain modulation weighted by 5-HT2A
+receptor density (Beliveau et al., 2017). Topological state-space
+analysis via Takens embedding and persistent homology reveals a mapping
+from molecular receptor distribution to the global topological manifold.
+We define <em>ego dissolution</em> operationally as a breakdown of
+low-dimensional Betti-1 stability: a transition from a single dominant
+1-cycle (constrained dynamics) to fragmented or higher-dimensional
+topological structure. The RCDT hypothesis is explicitly falsifiable:
+receptor-shuffling controls and concentration–topology response curves
+provide clear failure criteria. This work establishes a formal framework
+for bridging pharmacology, dynamics, and topology without invoking
+phenomenological experience as a premise.</p>
+<p><strong>Keywords:</strong> Whole-brain dynamics; Persistent homology;
+Wilson–Cowan model; 5-HT2A receptor; Pharmacological gain modulation;
+Topological data analysis; Ego dissolution; Scale bridge</p>
+<hr />
+<h2 id="introduction">Introduction</h2>
+<h3 id="the-scale-bridge-problem">The Scale Bridge Problem</h3>
+<p>A fundamental challenge in neuroscience is explaining how local
+molecular events—ligand binding to receptors, ion channel gating,
+synaptic plasticity—give rise to global brain states that correlate with
+conscious experience. This “scale bridge” problem persists across
+disciplines: pharmacology describes concentration–response curves at the
+synapse; neuroimaging captures mesoscale network activity; phenomenology
+reports subjective states. No principled theory currently connects these
+levels.</p>
+<p>We propose that the <em>essence of mind</em>, insofar as it admits
+scientific treatment, may be formalized as a <strong>topological
+invariant</strong> of a high-dimensional neural manifold embedded in
+state space. Rather than identifying consciousness with any particular
+phenomenological content, we ask: <em>what structural properties of the
+global dynamical attractor change when pharmacological perturbations
+alter receptor-mediated gain?</em> The answer, if tractable, would
+provide a mechanistic bridge from molecular to systems-level
+organization.</p>
+<h3 id="the-rcdt-hypothesis">The RCDT Hypothesis</h3>
+<p>The Receptor-Constrained Dynamical Topology (RCDT) hypothesis
+states:</p>
+<blockquote>
+<p>Spatially heterogeneous receptor-weighted gain modulation can induce
+<strong>qualitative phase transitions</strong> in whole-brain dynamics,
+detectable as changes in the persistent homology of the reconstructed
+state-space manifold.</p>
+</blockquote>
+<p>This formulation has several advantages:</p>
+<ol type="1">
+<li><strong>Mechanistic specificity</strong>: Pharmacology acts through
+receptor density distributions (e.g., 5-HT2A from PET), not global
+parameter shifts.</li>
+<li><strong>Geometric objectivity</strong>: Topological invariants
+(Betti numbers, persistence barcodes) are coordinate-free and do not
+depend on phenomenological interpretation.</li>
+<li><strong>Falsifiability</strong>: Failure modes are explicitly
+defined—e.g., topological changes independent of receptor map ρ would
+reject the hypothesis.</li>
+</ol>
+<hr />
+<h2 id="methods">Methods</h2>
+<h3 id="structural-scaffold">1. Structural Scaffold</h3>
+<p><strong>Anatomy</strong>: We use the Schaefer atlas (Schaefer et al.,
+2018) parcellated into 30 cortical regions, providing a low-resolution
+whole-brain scaffold suitable for in-silico simulation.</p>
+<p><strong>Connectivity</strong>: Structural connectivity (SC) is
+obtained from the Human Connectome Project (Van Essen et al., 2013). The
+group-averaged SC matrix () is normalized to unit spectral radius to
+ensure numerical stability of the coupled dynamics:</p>
+<p>[ _{} = ]</p>
+<p><strong>Axonal Delays</strong>: Inter-regional conduction delays are
+computed from Euclidean distances (D_{ij}) and a fixed axonal conduction
+velocity (v):</p>
+<p>[ _{ij} = ]</p>
+<p>where (v = 5) m/s (Caminiti et al., 2009). Delays prevent unphysical
+instantaneous synchronization and introduce biologically realistic
+temporal structure.</p>
+<h3 id="neural-mass-model-wilsoncowan-dynamics">2. Neural Mass Model:
+Wilson–Cowan Dynamics</h3>
+<p>Each brain region (i) is modeled as a Wilson–Cowan
+excitatory–inhibitory (E–I) population (Wilson &amp; Cowan, 1972). The
+coupled differential equations are:</p>
+<p>[ <em>E <em>i = -E_i + S( G_i ( w</em>{EE} E_i - w</em>{IE} I_i +
+<em>{j} C</em>{ij} E_j(t - _{ij}) + P_i ) ) ]</p>
+<p>[ <em>I <em>i = -I_i + S( w</em>{EI} E_i - w</em>{II} I_i ) ]</p>
+<p>where: - (E_i), (I_i): excitatory and inhibitory population
+activities - (_E), (<em>I): population time constants - (C</em>{ij}):
+structural connectivity (normalized) - (P_i): background/baseline input
+- (S(x) = (1 + e<sup>{-x})</sup>{-1}): sigmoidal transfer function -
+(G_i): <strong>heterogeneous gain</strong> (see below)</p>
+<p>The gain (G_i) modulates the effective input to the excitatory
+population, providing the pharmacological coupling.</p>
+<h4 id="stochastic-integration-eulermaruyama-scheme">2.1 Stochastic
+Integration: Euler–Maruyama Scheme</h4>
+<p>Numerical integration was performed using the
+<strong>Euler–Maruyama</strong> scheme to accommodate both the
+deterministic dynamics and a small additive Brownian noise term. This
+stochastic extension prevents the system from remaining trapped in
+stable fixed points and facilitates exploration of the bifurcation
+regime. The update equations are:</p>
+<p>[ E_i(t + t) = E_i(t) + t + ^E_i, ^E_i (0, 1) ]</p>
+<p>[ I_i(t + t) = I_i(t) + t + ^I_i, ^I_i (0, 1) ]</p>
+<p>where () is the noise amplitude (default (= 0.02)) and () are
+independent standard normal variates. The () scaling ensures correct
+statistical properties of the discretized Wiener process. Activity
+variables are clipped to ([0, 1]) after each step. Axonal delays are
+implemented via a circular buffer storing recent excitatory activity
+history.</p>
+<h4 id="bifurcation-sweep-for-parameter-selection">2.2 Bifurcation Sweep
+for Parameter Selection</h4>
+<p>To identify the coupling sensitivity range where H₁ topological
+features (loops) first emerge, a <strong>parameter sweep</strong> was
+performed over (k ) at fixed ([D] = 1.0). For each (k), the model was
+integrated, the global mean excitatory signal extracted, and Persistent
+Entropy computed on the H₁ diagram. The <strong>bifurcation
+threshold</strong> (k_{}) was defined as the smallest (k) at which ((_1)
+). This procedure guides selection of (k) and ([D]) for the main
+simulations to ensure the system operates in a regime where
+pharmacological perturbations induce detectable topological transitions
+(see <em>fig2_supp_bifurcation_sweep.png</em>).</p>
+<h3 id="pharmacology-heterogeneous-gain-modulation">3. Pharmacology:
+Heterogeneous Gain Modulation</h3>
+<p>Pharmacological perturbation is implemented as <strong>node-specific
+gain modulation</strong> weighted by regional receptor density:</p>
+<p>[ G_i = G_0 + k _i ]</p>
+<p>where: - (G_0 = 1.0): baseline gain - (_i): normalized 5-HT2A
+receptor density in region (i) (Beliveau et al., 2017; NeuroVault
+collection) - ([D]): drug concentration operator (control parameter) -
+(k ): coupling strength scaling receptor–gain sensitivity (range
+determined by bifurcation sweep)</p>
+<p>This formulation ensures: - <strong>Identical drug exposure</strong>
+across all nodes (systemic administration) - <strong>Differential
+functional impact</strong> determined solely by (_i) -
+<strong>Bifurcation potential</strong>: Sufficient (k _i ) can shift
+local dynamics from stable fixed points to limit cycles or chaos,
+propagating via structural coupling.</p>
+<p>No assumptions are made regarding phenomenological effects (e.g.,
+“psychedelic experience”); the model tests structural consequences
+only.</p>
+<h3 id="topological-data-analysis-tda-pipeline">4. Topological Data
+Analysis (TDA) Pipeline</h3>
+<h4 id="state-space-reconstruction-takens-theorem">4.1 State-Space
+Reconstruction (Takens’ Theorem)</h4>
+<p>Given a scalar time series (x(t)), we reconstruct the underlying
+attractor using time-delay embedding (Takens, 1981):</p>
+<p>[ (t) = ]</p>
+<p>Parameters: - Embedding dimension: (m = 3) - Delay (): chosen via
+mutual information or first minimum of autocorrelation - No
+system-specific tuning beyond minimal feasibility</p>
+<h4 id="vietorisrips-complex">4.2 Vietoris–Rips Complex</h4>
+<p>For a point cloud (X ^m) and scale parameter (), the
+<strong>Vietoris–Rips complex</strong> ((X, )) is the abstract
+simplicial complex where a simplex (= [v_0, v_1, , v_k]) is included iff
+all pairwise distances (d(v_i, v_j) ) for (v_i, v_j ).</p>
+<p>As () increases, we obtain a filtration:</p>
+<p>[ (X, _0) (X, <em>1) (X, </em>{}) ]</p>
+<h4 id="persistent-homology-and-persistence-barcode">4.3 Persistent
+Homology and Persistence Barcode</h4>
+<p>Persistent homology tracks the birth and death of topological
+features (connected components, loops, voids) across the filtration. A
+(p)-dimensional homology class born at (_b) and dying at (_d) is
+represented as an interval ((_b, _d)) in the <strong>persistence
+barcode</strong>.</p>
+<p>We compute: - <strong>H₀</strong>: connected components (0-cycles) -
+<strong>H₁</strong>: loops (1-cycles; Betti-1)</p>
+<p><strong>Discrimination criterion</strong>: - <strong>Limit cycle
+dynamics</strong>: single dominant H₁ feature with long persistence -
+<strong>Chaotic dynamics</strong>: multiple H₁ features or broadened
+persistence distribution - <strong>Noise</strong>: persistence diagram
+collapses to the diagonal (short-lived features)</p>
+<h4 id="persistent-entropy-quantitative-summary">4.4 Persistent Entropy
+(Quantitative Summary)</h4>
+<p>To quantify topological complexity as a scalar function of ([D]), we
+compute <strong>Persistent Entropy</strong> (Atienza et al., 2016) on
+the H₁ persistence diagram:</p>
+<p>[ = -_{i} p_i p_i, p_i = , _i = d_i - b_i, L = _i _i ]</p>
+<p>where ((b_i, d_i)) are birth–death pairs and (_i) are lifetimes.
+Higher PE indicates a more dispersed distribution of feature lifetimes
+(fragmented topology); lower PE indicates concentration in few dominant
+features (constrained attractor). A <strong>non-linear jump</strong> in
+PE as ([D]) increases provides quantitative support for the phase
+transition hypothesis (see Figure 3).</p>
+<hr />
+<h2 id="proposed-validation">Proposed Validation</h2>
+<h3 id="aim-1-tda-pipeline-calibration-instrument-validation">Aim 1: TDA
+Pipeline Calibration (Instrument Validation)</h3>
+<p><strong>Objective</strong>: Verify that the Takens + persistent
+homology pipeline can discriminate deterministic ordered dynamics from
+deterministic chaotic dynamics using only scalar observations.</p>
+<p><strong>Method</strong>: - <strong>Ordered system</strong>: Van der
+Pol oscillator (limit cycle) - <strong>Chaotic system</strong>: Lorenz
+system (strange attractor) - Single scalar observable (x(t)) from each;
+identical embedding and TDA parameters</p>
+<p><strong>Success criterion</strong>: - Van der Pol: single dominant
+Betti-1 feature - Lorenz: increased topological complexity (multiple or
+broadened H₁ features) - Noise: no long-lived features</p>
+<p><em>Without this calibration, downstream inference is
+invalid.</em></p>
+<h3 id="aim-2-receptor-shuffling-control-mechanism-isolation">Aim 2:
+Receptor Shuffling Control (Mechanism Isolation)</h3>
+<p><strong>Objective</strong>: Isolate 5-HT2A-specific effects from
+generic gain heterogeneity.</p>
+<p><strong>Method</strong>: For each drug concentration ([D]), run two
+conditions: 1. <strong>Experimental</strong>: (G_i = G_0 + k <em>i )
+(true receptor map) 2. <strong>Control</strong>: (G_i = G_0 + k
+</em>{(i)} ) where () is a random permutation of region indices
+(shuffled receptor map)</p>
+<p><strong>Interpretation</strong>: If topological changes are similar
+under shuffling, the effect is not 5-HT2A-specific; the RCDT hypothesis
+is weakened or rejected.</p>
+<h3 id="aim-3-critical-concentration-prediction">Aim 3: Critical
+Concentration Prediction</h3>
+<p><strong>Objective</strong>: Predict a non-linear jump in topological
+complexity at a critical concentration ([D]_{}).</p>
+<p><strong>Method</strong>: Compute <strong>Persistent Entropy</strong>
+(Section 4.4) as a function of ([D]) and plot the concentration–topology
+response curve (Figure 3). The RCDT hypothesis predicts: - Below
+([D]<em>{}): low-dimensional attractor (stable Betti-1) - At/near
+([D]</em>{}): bifurcation; non-linear increase in persistent entropy -
+Above ([D]_{}): fragmented or high-dimensional topology</p>
+<p><strong>Deliverable</strong>: Figure 3—a line plot of Persistent
+Entropy vs ([D]). A non-linear jump at ([D]_{}) provides quantitative
+evidence for the phase transition; absence of such structure would
+falsify the bifurcation mechanism.</p>
+<hr />
+<h2 id="results">Results</h2>
+<h3 id="figure-1-tda-pipeline-calibration">Figure 1: TDA Pipeline
+Calibration</h3>
+<p><strong>File</strong>: <code>fig1_tda_validation.png</code></p>
+<p>The Takens embedding + persistent homology pipeline was validated on
+canonical dynamical systems. Van der Pol (limit cycle) yields a single
+dominant H₁ feature with long persistence; Lorenz (chaos) yields
+increased topological complexity (multiple or broadened H₁ features).
+This calibration establishes that the TDA pipeline discriminates ordered
+from chaotic dynamics using only scalar observations, without access to
+governing equations.</p>
+<h3 id="figure-2-receptor-weighted-topological-reorganization">Figure 2:
+Receptor-Weighted Topological Reorganization</h3>
+<p><strong>Files</strong>: <code>fig2_receptor_topology.png</code>,
+<code>fig2_supp_shuffled_control.png</code>,
+<code>fig2_supp_bifurcation_sweep.png</code></p>
+<p>The whole-brain Wilson–Cowan model with heterogeneous gain modulation
+(Eq. 3) was simulated across drug concentrations ([D] {0, 0.5, 1.0, 1.5,
+2.0}). Panel A shows the structural connectivity graph with nodes
+coloured by 5-HT2A receptor density (<em>i). Panels B–F display
+persistence diagrams for each concentration. The receptor shuffling
+control (<code>fig2_supp_shuffled_control.png</code>) compares
+experimental vs. permuted (); divergence supports 5-HT2A-specificity.
+The bifurcation sweep (<code>fig2_supp_bifurcation_sweep.png</code>)
+identifies (k</em>{}) where H₁ features first emerge.</p>
+<h3 id="figure-3-persistent-entropy-quantifies-phase-transition">Figure
+3: Persistent Entropy Quantifies Phase Transition</h3>
+<p><strong>File</strong>: <code>fig3_persistent_entropy.png</code></p>
+<p><strong>Caption</strong>: Persistent Entropy (H₁) as a function of
+drug concentration ([D]). The RCDT hypothesis predicts a
+<strong>non-linear jump</strong> in PE as ([D]) crosses a critical value
+([D]<em>{}). Below ([D]</em>{}), the attractor remains low-dimensional
+(few dominant 1-cycles), yielding low PE. Above ([D]<em>{}), the
+topology fragments—multiple loops emerge with dispersed
+lifetimes—raising PE. This curve provides <em>quantitative</em> evidence
+for a phase transition: a sharp PE increase indicates bifurcation of the
+global dynamical regime, operationally consistent with <em>ego
+dissolution</em> as Betti-1 stability breakdown. When experimental (true
+()) and shuffled ((</em>)) conditions are compared, a larger PE increase
+in the experimental group supports receptor-specificity. Absence of a
+non-linear jump would falsify the bifurcation mechanism; flat or
+monotonic PE would indicate the system remains in a single dynamical
+regime across ([D]).</p>
+<hr />
+<h2 id="synthetic-parameter-table">Synthetic Parameter Table</h2>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 23%" />
+<col style="width: 20%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Symbol</th>
+<th>Value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Parcellation</td>
+<td>—</td>
+<td>Schaefer 30 nodes</td>
+<td>Schaefer et al., 2018</td>
+</tr>
+<tr>
+<td>Structural connectivity</td>
+<td>()</td>
+<td>HCP group-averaged</td>
+<td>Van Essen et al., 2013</td>
+</tr>
+<tr>
+<td>Conduction velocity</td>
+<td>(v)</td>
+<td>5 m/s</td>
+<td>Caminiti et al., 2009</td>
+</tr>
+<tr>
+<td>Baseline gain</td>
+<td>(G_0)</td>
+<td>1.0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Receptor–gain coupling</td>
+<td>(k)</td>
+<td>[0.5, 5.0]</td>
+<td>Bifurcation sweep</td>
+</tr>
+<tr>
+<td>Noise amplitude</td>
+<td>()</td>
+<td>0.02</td>
+<td>Euler–Maruyama</td>
+</tr>
+<tr>
+<td>5-HT2A receptor map</td>
+<td>(_i)</td>
+<td>Normalized PET</td>
+<td>Beliveau et al., 2017; NeuroVault</td>
+</tr>
+<tr>
+<td>Embedding dimension</td>
+<td>(m)</td>
+<td>3</td>
+<td>Takens</td>
+</tr>
+<tr>
+<td>Embedding delay</td>
+<td>()</td>
+<td>Data-dependent</td>
+<td>Mutual information</td>
+</tr>
+<tr>
+<td>E population time constant</td>
+<td>(_E)</td>
+<td>10 ms</td>
+<td>Wilson–Cowan</td>
+</tr>
+<tr>
+<td>I population time constant</td>
+<td>(_I)</td>
+<td>5 ms</td>
+<td>Wilson–Cowan</td>
+</tr>
+<tr>
+<td>E→E weight</td>
+<td>(w_{EE})</td>
+<td>1.2</td>
+<td>—</td>
+</tr>
+<tr>
+<td>I→E weight</td>
+<td>(w_{IE})</td>
+<td>1.0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>E→I weight</td>
+<td>(w_{EI})</td>
+<td>1.0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>I→I weight</td>
+<td>(w_{II})</td>
+<td>0.7</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="discussion">Discussion</h2>
+<h3 id="topological-interpretation-of-state-transitions">Topological
+Interpretation of State Transitions</h3>
+<p>The RCDT hypothesis interprets the shift from low-dimensional
+attractors to fragmented, high-dimensional structures as a
+<strong>topological phase transition</strong>. A single dominant Betti-1
+cycle indicates constrained, quasi-periodic dynamics—consistent with a
+brain state that maintains coherent global structure.
+Fragmentation—multiple disconnected loops or higher homology—suggests
+decoupling of regional dynamics, reduced integrability, and potential
+correlates of <em>ego dissolution</em> when operationally defined as
+loss of low-dimensional Betti-1 stability.</p>
+<p>This interpretation is mechanistic and geometric; it does not claim
+that topology <em>is</em> consciousness, but that topology may serve as
+an objective readout of dynamical regime changes induced by
+receptor-weighted pharmacology.</p>
+<h3 id="explicit-falsifiability">Explicit Falsifiability</h3>
+<p>The RCDT hypothesis is rejected if any of the following obtain:</p>
+<ol type="1">
+<li><p><strong>Receptor-map independence</strong>: Topological changes
+under drug perturbation are statistically indistinguishable when (<em>i)
+is replaced by a shuffled (</em>{(i)}). This would imply that receptor
+distribution is irrelevant—the effect would be generic gain modulation,
+not 5-HT2A-specific.</p></li>
+<li><p><strong>Noise-equivalent topology</strong>: The persistent
+homology of simulated time series is indistinguishable from that of
+appropriately scaled noise (e.g., surrogate data). This would invalidate
+the claim that deterministic structure is being detected.</p></li>
+<li><p><strong>Monotonic or absent concentration–topology
+relationship</strong>: Persistent entropy (or equivalent) shows no
+non-linear jump, or no systematic change, as ([D]) increases. The
+hypothesis predicts a critical transition; its absence would falsify the
+bifurcation mechanism.</p></li>
+</ol>
+<hr />
+<h2 id="conclusion">Conclusion</h2>
+<p>We have formalized the Receptor-Constrained Dynamical Topology (RCDT)
+hypothesis—a mechanistic bridge from molecular receptor distribution to
+global topological manifold reorganization. The framework is
+biophysically grounded (Wilson–Cowan, structural connectivity, delays),
+pharmacologically explicit (5-HT2A-weighted gain), and topologically
+rigorous (Takens, Vietoris–Rips, persistent homology). Operational
+definitions (e.g., ego dissolution as Betti-1 breakdown) and explicit
+falsification criteria ensure that the hypothesis is testable. Future
+work will implement the proposed validation aims and compare predictions
+with empirical neuroimaging data.</p>
+<hr />
+<h2 id="references">References</h2>
+<ul>
+<li>Atienza, N. et al. (2016). Separating topological noise from
+features using persistent entropy. <em>arXiv:1605.02885</em>.</li>
+<li>Beliveau, V. et al. (2017). A high-resolution in vivo atlas of the
+human brain’s serotonin system. <em>Journal of Neuroscience</em>, 37(1),
+120–128.</li>
+<li>Caminiti, R. et al. (2009). Evolution amplified processing with
+temporally dispersed slow neuronal connectivity in primates.
+<em>Proceedings of the National Academy of Sciences</em>, 106(46),
+19551–19556.</li>
+<li>Schaefer, A. et al. (2018). Local-global parcellation of the human
+cerebral cortex from intrinsic functional connectivity MRI. <em>Cerebral
+Cortex</em>, 28(9), 3095–3114.</li>
+<li>Takens, F. (1981). Detecting strange attractors in turbulence.
+<em>Lecture Notes in Mathematics</em>, 898, 366–381.</li>
+<li>Van Essen, D. C. et al. (2013). The WU-Minn Human Connectome
+Project. <em>NeuroImage</em>, 80, 62–79.</li>
+<li>Wilson, H. R., &amp; Cowan, J. D. (1972). Excitatory and inhibitory
+interactions in localized populations of model neurons. <em>Biophysical
+Journal</em>, 12(1), 1–24.</li>
+</ul>
+<hr />
+<h2 id="data-and-code-availability">Data and Code Availability</h2>
+<ul>
+<li><strong>5-HT2A receptor map</strong>: NeuroVault
+(https://neurovault.org/)</li>
+<li><strong>Structural connectivity</strong>: Human Connectome Project
+(https://www.humanconnectome.org/)</li>
+<li><strong>Simulation code</strong>:
+https://github.com/lincNK/RCDT-Model</li>
+</ul>
+<hr />
+<p><em>Manuscript word count: ~2,400</em></p>
+</body>
+</html>

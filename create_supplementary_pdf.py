@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Combine supplementary figures into a single PDF for bioRxiv submission."""
+"""
+RCDT 全脑动力学拓扑分析系统 V1.1
+Author: Haolong Wang | 开发完成日期：2026年2月
+
+Combine supplementary figures into a single PDF for bioRxiv submission.
+"""
 
 import os
 from matplotlib.image import imread

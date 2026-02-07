@@ -1,3 +1,519 @@
+软件著作权登记 - 源程序文档
+RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang
+总行数: 1021 | 总页数: 21 (每页约50行)
+============================================================
+
+----- 第 1 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+
+============================================================
+# 文件: main.py
+============================================================
+
+#!/usr/bin/env python3
+"""
+RCDT 全脑动力学拓扑分析系统 V1.1
+Author: Haolong Wang | 开发完成日期：2026年2月
+
+统一入口：调度 TDA 校验（figure1）与全脑仿真/拓扑分析（figure2）。
+运行方式：
+  python main.py figure1        # 生成 Fig1 TDA 校验图
+  python main.py figure2        # 生成 Fig2/Fig3 主图与持久熵
+  python main.py figure2 --quick
+  python main.py figure2 --shuffled
+  python main.py figure2 --sweep
+"""
+
+import argparse
+import os
+import subprocess
+import sys
+
+SOFTWARE_NAME = "RCDT 全脑动力学拓扑分析系统"
+VERSION = "V1.1"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def _run_module(module_name, extra_args=None):
+    """在项目根目录下以子进程运行指定模块，保持工作目录与当前环境一致。"""
+    module_path = os.path.join(SCRIPT_DIR, module_name)
+    if not os.path.isfile(module_path):
+        print(f"错误: 未找到模块文件 {module_path}", file=sys.stderr)
+        sys.exit(1)
+    cmd = [sys.executable, module_path]
+    if extra_args:
+        cmd.extend(extra_args)
+    result = subprocess.run(cmd, cwd=SCRIPT_DIR)
+    sys.exit(result.returncode)
+
+
+def cmd_figure1(args):
+    """执行 Figure 1：TDA 管道校验（Van der Pol / Lorenz）。优化: 支持 --seed 复现。"""
+    extra = []
+    if getattr(args, "seed", None) is not None:
+        extra.extend(["--seed", str(args.seed)])
+    _run_module("figure1_persistence_diagram.py", extra if extra else None)
+
+
+
+----- 第 2 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+def cmd_figure2(args):
+    """执行 Figure 2/3：全脑仿真与持久熵分析。优化: 支持 --seed, --surrogate, --n-shuffles, --n-seeds-sweep。"""
+    extra = []
+    if getattr(args, "quick", False):
+        extra.append("--quick")
+    if getattr(args, "shuffled", False):
+        extra.append("--shuffled")
+    if getattr(args, "sweep", False):
+        extra.append("--sweep")
+    if getattr(args, "surrogate", False):
+        extra.append("--surrogate")
+    if getattr(args, "seed", None) is not None:
+        extra.extend(["--seed", str(args.seed)])
+    if getattr(args, "n_shuffles", 1) != 1:
+        extra.extend(["--n-shuffles", str(args.n_shuffles)])
+    if getattr(args, "n_seeds_sweep", 1) != 1:
+        extra.extend(["--n-seeds-sweep", str(args.n_seeds_sweep)])
+    _run_module("figure2_simulation.py", extra if extra else None)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="main.py",
+        description=f"{SOFTWARE_NAME} {VERSION} — 统一运行入口",
+    )
+    subparsers = parser.add_subparsers(dest="command", help="可用命令")
+
+    # figure1
+    p1 = subparsers.add_parser("figure1", help="生成 Figure 1：TDA 校验（极限环 vs 混沌）")
+    p1.add_argument("--seed", type=int, default=42, help="随机种子（复现论文图）")
+    p1.set_defaults(func=cmd_figure1)
+
+    # figure2
+    p2 = subparsers.add_parser("figure2", help="生成 Figure 2/3：全脑仿真与持久熵")
+    p2.add_argument("--quick", action="store_true", help="快速模式（缩短仿真时间）")
+    p2.add_argument("--shuffled", action="store_true", help="同时运行受体洗牌对照")
+    p2.add_argument("--sweep", action="store_true", help="分岔参数扫描（k vs 持久熵）")
+    p2.add_argument("--surrogate", action="store_true", help="替代数据检验（相位随机化）")
+    p2.add_argument("--n-shuffles", type=int, default=1, help="洗牌重复次数（>1 得 PE 分布）")
+    p2.add_argument("--n-seeds-sweep", type=int, default=1, help="分岔扫描 seed 数（>1 报告 k_crit 稳定性）")
+    p2.add_argument("--seed", type=int, default=42, help="主随机种子")
+    p2.set_defaults(func=cmd_figure2)
+
+    args = parser.parse_args()
+    if not args.command:
+        parser.print_help()
+        print("\n示例: python main.py figure1  或  python main.py figure2 --quick")
+        sys.exit(0)
+    args.func(args)
+
+
+----- 第 3 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+
+if __name__ == "__main__":
+    main()
+
+============================================================
+# 文件: rcdt_params.py
+============================================================
+
+"""
+RCDT 全脑动力学拓扑分析系统 V1.1
+Author: Haolong Wang | 开发完成日期：2026年2月
+
+优化: 参数集中管理，与稿中 Synthetic Parameter Table 一致，便于复现与敏感性分析。
+论文对应初版程序为各脚本内散落的魔数；本模块为后续优化版本统一入口。
+"""
+
+import numpy as np
+
+# =============================================================================
+# Wilson–Cowan 与解剖/药理学（与稿中 Table 对应）
+# =============================================================================
+N_NODES = 30
+TAU_E = 10.0       # ms, E 种群时间常数
+TAU_I = 5.0        # ms, I 种群时间常数
+W_EE = 1.2
+W_IE = 1.0
+W_EI = 1.0
+W_II = 0.7
+G_0 = 1.0
+K_GAIN = 2.5
+K_GAIN_RANGE = (0.5, 5.0)
+SIGMA_NOISE = 0.02
+V_CONDUCTION = 5.0  # mm/ms
+DT = 0.005
+TOTAL_TIME_MS = 60000
+TRANSIENT_MS = 10000
+D_CONCENTRATIONS = [0.0, 0.5, 1.0, 1.5, 2.0]
+
+# =============================================================================
+# TDA 管道默认值（初版 figure2 使用 tau=15, n_samples=1200）
+# =============================================================================
+EMBED_DIM = 3
+TAU_EMBED_DEFAULT = 15       # 初版全脑仿真固定延迟（样本数）
+N_SAMPLES_TDA_DEFAULT = 1200
+N_SAMPLES_TDA_QUICK = 400
+PE_H1_THRESHOLD = 0.01       # 分岔扫描中 H1 出现的 PE 阈值
+
+# =============================================================================
+# 优化: [D]_crit 定量定义并输出（稿中为定性描述）
+# 定义方式: PE([D]) 曲线拐点 = 二阶差最大处，或首超 PE 阈值的 [D]
+
+----- 第 4 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+# =============================================================================
+def compute_D_crit(D_vals, PE_vals, method='max_second_derivative'):
+    """
+    从 PE([D]) 曲线计算临界浓度 [D]_crit。
+
+    Parameters
+    ----------
+    D_vals : array-like
+        药物浓度序列
+    PE_vals : array-like
+        对应的 H1 持久熵
+    method : str
+        'max_second_derivative': [D]_crit = 二阶差最大处（拐点）
+        'first_above_threshold': 首个 PE >= PE_threshold 的 [D]（需与 PE_H1_THRESHOLD 一致时用）
+
+    Returns
+    -------
+    D_crit : float or None
+        估计的 [D]_crit；无法估计时返回 None
+    """
+    D_vals = np.asarray(D_vals, dtype=float)
+    PE_vals = np.asarray(PE_vals, dtype=float)
+    if len(D_vals) < 3 or len(D_vals) != len(PE_vals):
+        return None
+    if method == 'max_second_derivative':
+        # 拐点: 二阶差最大（离散二阶导）
+        d2 = np.diff(PE_vals, 2)
+        if len(d2) == 0:
+            return None
+        idx = np.argmax(d2)
+        # 二阶差对应区间中点
+        D_crit = float(0.5 * (D_vals[idx] + D_vals[idx + 2]))
+        return D_crit
+    if method == 'first_above_threshold':
+        above = np.where(PE_vals >= PE_H1_THRESHOLD)[0]
+        if len(above) == 0:
+            return None
+        return float(D_vals[above[0]])
+    return None
+
+============================================================
+# 文件: rcdt_tda.py
+============================================================
+
+"""
+RCDT 全脑动力学拓扑分析系统 V1.1
+Author: Haolong Wang | 开发完成日期：2026年2月
+
+优化: 将 TDA 管道抽离为公共模块，供 figure1 与 figure2 复用，保证嵌入/持久同调/持久熵
+计算一致；初版程序在两脚本中各自实现，易产生 τ/m 等参数不一致。
+
+----- 第 5 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+"""
+
+import numpy as np
+
+try:
+    import ripser
+except ImportError:
+    ripser = None
+
+
+def takens_embedding(x, m=3, tau=1):
+    """
+    标量时间序列的 Takens 时间延迟嵌入。
+    X(t) = [x(t), x(t+τ), ..., x(t+(m-1)τ)]
+    """
+    x = np.asarray(x).ravel()
+    n = len(x)
+    N_embed = n - (m - 1) * tau
+    if N_embed <= 0:
+        raise ValueError("Time series too short for embedding (m=%d, tau=%d, n=%d)" % (m, tau, n))
+    X = np.zeros((N_embed, m))
+    for i in range(m):
+        X[:, i] = x[i * tau : i * tau + N_embed]
+    return X
+
+
+def tau_first_min_autocorr(x, tau_max=50):
+    """
+    优化: 嵌入延迟 τ 由自相关函数第一个局部最小选取（稿中建议 mutual information
+    或 first minimum of autocorrelation）；初版为各图 ad hoc 固定值。
+    Returns tau in sample index (int).
+    """
+    x = np.asarray(x).ravel()
+    n = len(x)
+    x = x - np.mean(x)
+    c0 = np.dot(x, x)
+    if c0 <= 0:
+        return 1
+    acf = np.array([np.dot(x[:n - k], x[k:]) / c0 for k in range(min(tau_max + 1, n // 2))])
+    # 第一个局部最小：acf[i] < acf[i-1] and acf[i] < acf[i+1]
+    for i in range(1, len(acf) - 1):
+        if acf[i] <= acf[i - 1] and acf[i] <= acf[i + 1]:
+            return max(1, i)
+    return max(1, np.argmin(acf[1:]) + 1)
+
+
+def compute_persistence(point_cloud, maxdim=1):
+    """Vietoris–Rips 持久同调（Ripser）。返回 list of (birth, death) arrays for H0, H1, ..."""
+    if ripser is None:
+        raise ImportError("ripser is required for compute_persistence")
+
+----- 第 6 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+    result = ripser.ripser(point_cloud, maxdim=maxdim)
+    return result['dgms']
+
+
+def persistent_entropy(diagrams, dim=1, treat_infinite_lifetime=None):
+    """
+    H_dim 持久熵 PE = -Σ p_i ln(p_i)，p_i = l_i/L，l_i = death - birth。
+    优化: 无穷长条（death=inf）可选用 treat_infinite_lifetime 截断或排除，与文献一致；
+    初版仅用有限 lifetime，未显式说明 inf 处理。
+    """
+    if dim >= len(diagrams) or len(diagrams[dim]) == 0:
+        return 0.0
+    dgm = np.array(diagrams[dim])
+    finite = np.isfinite(dgm[:, 1])
+    lifetimes = (dgm[finite, 1] - dgm[finite, 0]).astype(float)
+    # 无穷长条：可选截断为最大有限 death 的倍数
+    if not np.all(finite) and treat_infinite_lifetime is not None:
+        max_finite = np.max(dgm[finite, 1]) if np.any(finite) else 1.0
+        for i in range(len(dgm)):
+            if not finite[i]:
+                lifetimes = np.append(lifetimes, treat_infinite_lifetime * max_finite)
+    lifetimes = lifetimes[lifetimes > 1e-12]
+    if len(lifetimes) == 0:
+        return 0.0
+    L = lifetimes.sum()
+    if L <= 0:
+        return 0.0
+    p = lifetimes / L
+    return float(-np.sum(p * np.log(p + 1e-15)))
+
+
+def subsample_point_cloud(X, n_samples=1200, seed=42):
+    """点云随机子采样以控制计算量，seed 可复现。"""
+    rng = np.random.default_rng(seed)
+    n = X.shape[0]
+    if n <= n_samples:
+        return X
+    idx = rng.choice(n, n_samples, replace=False)
+    return X[np.sort(idx)]
+
+
+def surrogate_phase_randomize(x, seed=None):
+    """
+    优化: 替代数据（相位随机化），用于检验拓扑是否区别于纯噪声（稿中可证伪性）。
+    保持功率谱，破坏相位关系。返回与 x 等长的 1D 数组。
+    """
+    x = np.asarray(x).ravel()
+    rng = np.random.default_rng(seed)
+    n = len(x)
+    if n < 4:
+
+----- 第 7 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+        return x.copy()
+    X = np.fft.rfft(x)
+    phase = np.angle(X)
+    # 保持 DC 和 Nyquist 相位，其余随机化
+    new_phase = phase.copy()
+    idx = np.arange(1, len(phase) - (1 if n % 2 == 0 else 0), dtype=int)
+    new_phase[idx] = rng.uniform(-np.pi, np.pi, size=len(idx))
+    Y = np.abs(X) * np.exp(1j * new_phase)
+    return np.fft.irfft(Y, n=n).real
+
+============================================================
+# 文件: figure1_persistence_diagram.py
+============================================================
+
+"""
+RCDT 全脑动力学拓扑分析系统 V1.1
+Author: Haolong Wang | 开发完成日期：2026年2月
+
+Figure 1: Topological Discrimination Between Ordered and Chaotic Dynamics
+RCDT Hypothesis - Aim 1 Calibration (Instrument Validation)
+
+Generates persistence diagrams for:
+- Panel A/B: Van der Pol oscillator (limit cycle, ordered dynamics)
+- Panel C/D: Lorenz system (chaos, complex dynamics)
+
+Uses: Takens time-delay embedding + Vietoris–Rips filtration (via Ripser)
+Output: 2x2 composite figure suitable for bioRxiv preprint
+
+优化: 从 rcdt_tda 复用 takens_embedding / compute_persistence / subsample_point_cloud，
+     与 figure2 管道一致；初版为本地重复实现。
+"""
+
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+
+from rcdt_tda import takens_embedding, compute_persistence, subsample_point_cloud
+
+try:
+    from persim import plot_diagrams
+    HAS_PERSIM = True
+except ImportError:
+    HAS_PERSIM = False
+
+# =============================================================================
+# 1. Dynamical Systems（Figure 1 专用，保留于本脚本）
+# =============================================================================
+
+def van_der_pol(t, y, mu=1.0):
+
+----- 第 8 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+    """Van der Pol oscillator: d²x/dt² - mu(1-x²)dx/dt + x = 0."""
+    x, v = y
+    return [v, mu * (1 - x**2) * v - x]
+
+def lorenz(t, y, sigma=10.0, rho=28.0, beta=8/3):
+    """Lorenz system: dx/dt = sigma(y-x), dy/dt = x(rho-z)-y, dz/dt = xy - beta*z."""
+    x, y_, z = y
+    return [sigma * (y_ - x), x * (rho - z) - y_, x * y_ - beta * z]
+
+# =============================================================================
+# 2. Time Series Generation
+# =============================================================================
+
+def generate_time_series(system_fn, y0, t_span, t_eval, obs_idx=0):
+    """Integrate ODE and return single scalar observable (simulating experimental conditions)."""
+    sol = solve_ivp(system_fn, t_span, y0, t_eval=t_eval, method='LSODA', rtol=1e-8, atol=1e-10)
+    return sol.y[obs_idx]
+
+# =============================================================================
+# 3. 可视化：持久图手绘后备（无 persim 时）
+# =============================================================================
+
+def _plot_persistence_manual(diagrams, ax, title=''):
+    """Manual persistence diagram plot (fallback when persim unavailable)."""
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # H0, H1, H2
+    for dim, dgm in enumerate(diagrams):
+        if len(dgm) == 0:
+            continue
+        dgm = np.array(dgm)
+        finite = np.isfinite(dgm[:, 1])
+        dgm_f = dgm[finite]
+        dgm_inf = dgm[~finite]
+        if len(dgm_f) > 0:
+            ax.scatter(dgm_f[:, 0], dgm_f[:, 1], c=colors[dim % 3], label=f'$H_{dim}$', s=20)
+        if len(dgm_inf) > 0:
+            max_death = float(dgm_f[:, 1].max()) if len(dgm_f) > 0 else float(dgm_inf[:, 0].max()) * 1.2
+            ax.scatter(dgm_inf[:, 0], [max_death] * len(dgm_inf), c=colors[dim % 3],
+                      marker='o', s=20, edgecolors='k')
+    ax_max = max(ax.get_xlim()[1], ax.get_ylim()[1]) if ax.get_xlim()[1] > 0 else 1
+    ax.plot([0, ax_max], [0, ax_max], 'k--', alpha=0.5, linewidth=1)
+    ax.set_xlabel('Birth')
+    ax.set_ylabel('Death')
+    if title:
+        ax.set_title(title)
+
+# =============================================================================
+# 4. Figure 1 Assembly
+# =============================================================================
+
+def create_figure1(save_path='figure1_tda_validation.png', dpi=150, seed=42):
+
+----- 第 9 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+    """
+    Create Figure 1: Topological Discrimination Between Ordered and Chaotic Dynamics.
+    优化: seed 贯穿以复现；初版未显式传 seed。
+    """
+    # 初版论文使用固定 tau（Van der Pol 5, Lorenz 8），保证与预印本图一致
+    dt = 0.02
+    t_span = (0, 200)
+    t_eval = np.arange(0, t_span[1], dt)
+    discard_frac = 0.4
+    keep = int(len(t_eval) * (1 - discard_frac))
+    t_eval = t_eval[-keep:]
+
+    m = 3
+    tau_vdp = 5   # 初版固定；可选 rcdt_tda.tau_first_min_autocorr(x_vdp) 做自动选取
+    tau_lor = 8
+
+    # --- Van der Pol ---
+    y0_vdp = [1.0, 0.0]
+    x_vdp = generate_time_series(van_der_pol, y0_vdp, t_span, t_eval, obs_idx=0)
+    X_vdp = takens_embedding(x_vdp, m=m, tau=tau_vdp)
+    X_vdp = subsample_point_cloud(X_vdp, n_samples=1500, seed=seed)
+    diagrams_vdp = compute_persistence(X_vdp, maxdim=1)
+
+    # --- Lorenz ---
+    y0_lor = [1.0, 1.0, 1.0]
+    x_lor = generate_time_series(lorenz, y0_lor, t_span, t_eval, obs_idx=0)
+    X_lor = takens_embedding(x_lor, m=m, tau=tau_lor)
+    X_lor = subsample_point_cloud(X_lor, n_samples=1500, seed=seed)
+    diagrams_lor = compute_persistence(X_lor, maxdim=1)
+
+    # --- Figure Layout ---
+    fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+    ax_a = axes[0, 0]
+    ax_a.scatter(X_vdp[:, 0], X_vdp[:, 1], c=X_vdp[:, 2], cmap='viridis', s=2, alpha=0.6)
+    ax_a.set_xlabel('$x(t)$')
+    ax_a.set_ylabel('$x(t+\\tau)$')
+    ax_a.set_title('A. Van der Pol: Reconstructed Phase Space')
+    ax_a.set_aspect('equal')
+    ax_a.grid(True, alpha=0.3)
+
+    ax_b = axes[0, 1]
+    if HAS_PERSIM:
+        plot_diagrams(diagrams_vdp, ax=ax_b, show=False)
+    else:
+        _plot_persistence_manual(diagrams_vdp, ax_b)
+    ax_b.set_title('B. Van der Pol: Persistence Diagram')
+
+    ax_c = axes[1, 0]
+    ax_c.scatter(X_lor[:, 0], X_lor[:, 1], c=X_lor[:, 2], cmap='plasma', s=2, alpha=0.6)
+    ax_c.set_xlabel('$x(t)$')
+
+----- 第 10 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
+    ax_c.set_ylabel('$x(t+\\tau)$')
+    ax_c.set_title('C. Lorenz: Reconstructed Phase Space')
+    ax_c.set_aspect('equal')
+    ax_c.grid(True, alpha=0.3)
+
+    ax_d = axes[1, 1]
+    if HAS_PERSIM:
+        plot_diagrams(diagrams_lor, ax=ax_d, show=False)
+    else:
+        _plot_persistence_manual(diagrams_lor, ax_d)
+    ax_d.set_title('D. Lorenz: Persistence Diagram')
+
+    plt.suptitle(
+        'Figure 1 | Validation of TDA sensitivity to dynamical regime.\n'
+        'Time-delay embedding + persistent homology distinguishes ordered '
+        'limit-cycle dynamics from deterministic chaos using only scalar time series.',
+        fontsize=10, y=1.02
+    )
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
+    plt.close()
+    print(f"Figure 1 saved to {save_path}")
+
+# =============================================================================
+# Main
+# =============================================================================
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')
+    parser.add_argument('--output', default=None, help='Output path (default: figs/fig1_tda_validation.png)')
+    args = parser.parse_args()
+    fig_dir = os.path.join(os.path.dirname(__file__), 'figs')
+    os.makedirs(fig_dir, exist_ok=True)
+    out = args.output or os.path.join(fig_dir, 'fig1_tda_validation.png')
+    create_figure1(save_path=out, dpi=150, seed=args.seed)
+
+============================================================
+# 文件: figure2_simulation.py
+============================================================
+
 """
 RCDT 全脑动力学拓扑分析系统 V1.1
 Author: Haolong Wang | 开发完成日期：2026年2月
@@ -6,6 +522,8 @@ Figure 2: Receptor-Weighted Whole-Brain Wilson-Cowan Model
 RCDT Hypothesis - Pharmacologically Induced Topological Reorganization
 
 Implements:
+
+----- 第 11 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
 - 30-node Wilson-Cowan E-I dynamics with axonal delays
 - Synthetic SC matrix (unit spectral radius) and 5-HT2A receptor map
 - Gain modulation: G_i = G_0 + k * rho_i * [D]
@@ -56,6 +574,8 @@ N_SAMPLES_TDA_QUICK = pr.N_SAMPLES_TDA_QUICK
 PE_H1_THRESHOLD = pr.PE_H1_THRESHOLD
 
 # =============================================================================
+
+----- 第 12 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
 # 1. Synthetic Data Generation
 # =============================================================================
 
@@ -106,6 +626,8 @@ def run_wilson_cowan(C, D, rho, D_conc, G_0=G_0, k=K_GAIN,
     max_delay = min(int(50 / dt), 100)
     delay_steps_int = np.clip(delay_steps_int, 0, max_delay)
 
+
+----- 第 13 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
     G = G_0 + k * rho * D_conc
     E = 0.1 + 0.3 * rng.random(n)
     I = 0.05 + 0.15 * rng.random(n)
@@ -156,6 +678,8 @@ def global_mean_E(E_trajectory):
     return E_trajectory.mean(axis=1)
 
 # =============================================================================
+
+----- 第 14 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
 # 4. Receptor Shuffling
 # =============================================================================
 
@@ -206,6 +730,8 @@ def _create_figure3_persistent_entropy(results_exp, results_shuffled, save_path,
 
     if results_shuffled:
         # 优化: 支持多次洗牌时 results_shuffled 为 list of list，取均值±std
+
+----- 第 15 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
         if isinstance(results_shuffled[0], dict):
             PE_shuf = [r['PE'] for r in results_shuffled]
             ax.plot(D_vals, PE_shuf, 's--', color='#ff7f0e', linewidth=2, markersize=8, label='Shuffled ($\\rho_{\\pi}$)')
@@ -256,6 +782,8 @@ def create_figure2(save_path='fig2_receptor_topology.png', dpi=150,
         d_concs = [0.0, 1.0, 2.0]
     else:
         t_total = TOTAL_TIME_MS
+
+----- 第 16 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
         transient_ms = TRANSIENT_MS
         d_concs = D_CONCENTRATIONS
     n_samples_tda = N_SAMPLES_TDA_QUICK if quick_mode else N_SAMPLES_TDA_DEFAULT
@@ -306,6 +834,8 @@ def create_figure2(save_path='fig2_receptor_topology.png', dpi=150,
         # 优化: 替代数据 — 对实验轨迹做相位随机化后再走 TDA，检验拓扑是否区别于噪声
         results_surrogate = []
         for i, res in enumerate(results_exp):
+
+----- 第 17 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
             x_surr = surrogate_phase_randomize(res['x'], seed=seed + 3000 + i)
             X_emb = takens_embedding(x_surr, m=pr.EMBED_DIM, tau=tau_embed)
             X_sub = subsample_point_cloud(X_emb, n_samples=n_samples_tda, seed=seed + 4000 + i)
@@ -356,6 +886,8 @@ def create_figure2(save_path='fig2_receptor_topology.png', dpi=150,
             ax2 = fig2.add_subplot(2, 5, idx + 6)
             if HAS_PERSIM:
                 plot_diagrams(res_exp['dgms'], ax=ax1, show=False)
+
+----- 第 18 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
                 plot_diagrams(res_shuf['dgms'], ax=ax2, show=False)
             else:
                 _plot_persistence_manual(res_exp['dgms'], ax1)
@@ -406,6 +938,8 @@ def run_bifurcation_sweep(n_k=8, D_fixed=1.0, sigma_noise=SIGMA_NOISE,
     """
     分岔扫描：找 H1 首次出现的 k。优化: n_seeds>1 时多 seed 重复，返回 k_crit 均值与标准差。
     """
+
+----- 第 19 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
     pe_threshold = pe_threshold if pe_threshold is not None else PE_H1_THRESHOLD
     n_samples_tda = n_samples_tda if n_samples_tda is not None else N_SAMPLES_TDA_QUICK
     k_min, k_max = K_GAIN_RANGE
@@ -456,6 +990,8 @@ def run_bifurcation_sweep(n_k=8, D_fixed=1.0, sigma_noise=SIGMA_NOISE,
         E_traj = run_wilson_cowan(C, D, rho, D_fixed, k=k, sigma_noise=sigma_noise,
                                   t_total=t_total, transient_ms=transient, seed=seed + i)
         x = global_mean_E(E_traj)
+
+----- 第 20 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
         X = takens_embedding(x, m=pr.EMBED_DIM, tau=12)
         X_sub = subsample_point_cloud(X, n_samples=n_samples_tda, seed=seed + i)
         dgms = compute_persistence(X_sub, maxdim=1)
@@ -506,6 +1042,8 @@ if __name__ == '__main__':
 
     if args.sweep:
         if args.n_seeds_sweep == 1:
+
+----- 第 21 页 / 共 21 页 | RCDT 全脑动力学拓扑分析系统 V1.1 | Author: Haolong Wang -----
             k_vals, pe_vals, k_crit = run_bifurcation_sweep(seed=args.seed)
             out_dir = os.path.dirname(args.output)
             sweep_path = os.path.join(out_dir, 'fig2_supp_bifurcation_sweep.png') if out_dir else 'fig2_supp_bifurcation_sweep.png'
